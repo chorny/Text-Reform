@@ -55,3 +55,8 @@ Revision history for Perl extension Text::Reform.
 	- Added global pagewidth option
 
 	- fixed test.pl
+
+
+1.08	Wed Apr  2 22:27:23 2003
+
+	- fixed test.pl again

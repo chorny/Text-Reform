@@ -2,7 +2,7 @@ package Text::Reform;
 
 use strict; use vars qw($VERSION @ISA @EXPORT @EXPORT_OK); use Carp;
 use 5.005;
-$VERSION = '1.07';
+$VERSION = '1.08';
 
 require Exporter;
 
@@ -693,7 +693,7 @@ Text::Reform - Manual text wrapping and reformatting
 
 =head1 VERSION
 
-This document describes version 1.07 of Text::Reform,
+This document describes version 1.08 of Text::Reform,
 released April  2, 2003.
 
 =head1 SYNOPSIS
