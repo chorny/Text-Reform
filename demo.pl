@@ -2,7 +2,7 @@
 
 # TRY DOING *THIS* WITH format!
 
-use Text::Autoformat qw(form break_with);
+use Text::Reform qw(form break_with);
 
 my $text = join "", map "line $_\n", (1..20);
 

@@ -2,15 +2,15 @@
 
 use Text::Reform;
 
-print form { filler=>'*' },
+print +form { filler=>'*' },
 	"Pay bearer: ^^^^^^^^^^^^^^^^^^^",
 	'$123.45';
 
-print form { filler=>'-->' },
+print +form { filler=>'-->' },
 	"Pay bearer: ]]]]]]]]]]]]]]]]]]]",
 	['$1234.50', '$123.45', '$12.34'];
 
-print form { filler=>{left=>'->', right=>'*'} },
+print +form { filler=>{left=>'->', right=>'*'} },
 	"Pay bearer: <<<<<<<<<<<<<<<<<<",
 	'$123.45',
 	"Pay bearer: >>>>>>>>>>>>>>>>>>",

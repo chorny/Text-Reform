@@ -1,5 +1,5 @@
 ==============================================================================
-                   Release of version 1.06 of Text::Reform
+                   Release of version 1.07 of Text::Reform
 ==============================================================================
 
 
@@ -23,17 +23,40 @@ COPYRIGHT
 
 ==============================================================================
 
-CHANGES IN VERSION 1.06
+CHANGES IN VERSION 1.07
 
-(No changes have been documented for this version)
+
+	- tweaked demo bugs (were using Text::Autoformat instead of
+	  Text::Reform)
+
+	- squashed filling $gap bug (thanks Phil)
+
+	- fixed bug in handling config hashes (thanks Phil)
+
+	- fixed bug in formats without pagelengths
+
+	- fixed sprintf incompatibility in Perl 5.8 (thanks Andy)
+
+	- Added 'cols' option
+
+	- Fixed handling of final headers that are different lengths
+	  to intermediate headers 
+
+	- Allowed header/footer subs to return an left/centre/right hash
+
+	- Added warning when header+footer > pagelen
+
+	- Added warning when header or footer > page width
+
+	- Added global pagewidth option
+
+	- fixed test.pl
+
 
 ==============================================================================
 
 AVAILABILITY
 
 Text::Reform has been uploaded to the CPAN
-and is also available from:
-
-	http://www.csse.monash.edu.au/~damian/CPAN/Text-Reform.tar.gz
 
 ==============================================================================

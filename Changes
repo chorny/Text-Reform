@@ -26,3 +26,32 @@ Revision history for Perl extension Text::Reform.
 	  short lines (thanks Phil)
 
 	- Made recursive calls to &form respect page numbers correctly
+
+
+1.07	Wed Apr  2 04:39:48 2003
+
+	- tweaked demo bugs (were using Text::Autoformat instead of
+	  Text::Reform)
+
+	- squashed filling $gap bug (thanks Phil)
+
+	- fixed bug in handling config hashes (thanks Phil)
+
+	- fixed bug in formats without pagelengths
+
+	- fixed sprintf incompatibility in Perl 5.8 (thanks Andy)
+
+	- Added 'cols' option
+
+	- Fixed handling of final headers that are different lengths
+	  to intermediate headers 
+
+	- Allowed header/footer subs to return an left/centre/right hash
+
+	- Added warning when header+footer > pagelen
+
+	- Added warning when header or footer > page width
+
+	- Added global pagewidth option
+
+	- fixed test.pl

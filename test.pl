@@ -8,7 +8,7 @@
 # Change 1..1 below to 1..last_test_to_print .
 # (It may become useful if the test is moved to ./t subdirectory.)
 
-BEGIN { $| = 1; print "1..68\n"; }
+BEGIN { $| = 1; print "1..63\n"; }
 END {print "not ok 1\n" unless $loaded;}
 my $testnum = 1;
 sub teststr(&$) # (&sub, $retval)
@@ -16,8 +16,6 @@ sub teststr(&$) # (&sub, $retval)
 	do { $testnum++;
 	     my $res = &{$_[0]};
 	     my $exp = $_[1];
-	     $exp =~ s/ /./g;
-	     $res =~ s/ /./g;
 	     print "expected [", $exp, "]\n" unless $res eq $exp;
 	     print "but got  [", $res, "]\n" unless $res eq $exp;
 	     print "not " unless $res eq $exp;
@@ -31,55 +29,6 @@ print "ok 1\n";
 
 START:
 
-
-
-# MULTI-LINE FORMATS *WITH* INTERLEAVING
-
-teststr { form  {interleave=>1},
-		"[[[[[[[[\n========",
-		"a " x 12;
-}
-"a a a a 
-a a a a 
-a a a a 
-========
-";
-
-teststr { form  {interleave=>1},
-		"[[[[[[[[\n[[[[[[[[",
-		"a " x 12;
-}
-"a a a a 
-a a a a 
-a a a a 
-        
-";
-
-# MULTI-LINE FORMATS WITHOUT INTERLEAVING
-
-teststr { form 
-		"[[[[[[[[\n========",
-		"a " x 12;
-}
-"a a a a 
-========
-a a a a 
-========
-a a a a 
-========
-";
-
-teststr { form  
-		"[[[[[[[[\n[[[[[[[[",
-		"a " x 12;
-}
-"a a a a 
-        
-a a a a 
-        
-a a a a 
-        
-";
 
 # ZERO-WIDTH FIELD SEPARATOR
 
@@ -216,7 +165,7 @@ teststr { form("([[[[]])","a b c def ghijklm") }
 
 # ALIGNED NUMERICAL FORMATTING
 
-teststr { form("***]]]].[[[[***","huh 1 1.1 1.00001 1.00009 1.2345 1.23456 1111 12345.54321 a0 b 0") }
+teststr { form("***]]]].[[[[***","NaN 1 1.1 1.00001 1.00009 1.2345 1.23456 1111 12345.54321 a0 b 0") }
 "***????.????***
 ***   1.0   ***
 ***   1.1   ***
@@ -231,7 +180,7 @@ teststr { form("***]]]].[[[[***","huh 1 1.1 1.00001 1.00009 1.2345 1.23456 1111 
 ***   0.0   ***
 ";
 
-teststr { form( { numeric => 'SkipNaN,AllPlaces' }, "***]]]].[[[[***","huh 1 1.1 1.00001 1.00009 1.2345 1.23456 1111 12345.54321 a0 b 0") }
+teststr { form( { numeric => 'SkipNaN,AllPlaces' }, "***]]]].[[[[***","NaN 1 1.1 1.00001 1.00009 1.2345 1.23456 1111 12345.54321 a0 b 0") }
 "***   1.0000***
 ***   1.1000***
 ***   1.0000***
@@ -281,18 +230,6 @@ SCOPED:{
 	teststr { form "<"x10, $str } "a b c     \n";
 	teststr { form {squeeze=>0}, "<"x10, $str } "$str    \n";
 	teststr { form "<"x10, $str } "a b c     \n";
-}
-
-NO_USE:{
-	my $match = "Bad";
-	local $SIG{__WARN__} = sub
-	{
-		$match = "Good" if $_[0] =~ /^Configuration specified at .* was not used before it went out of scope/;
-	};
-	SCOPED:{
-		my $scope = form { squeeze=>1 };
-	}
-	teststr {$match} "Good";
 }
 
 # HYPHENATION
@@ -362,11 +299,9 @@ thousand
 ';
 
 # NO FILL MODE
-teststr { form({fill=>0, squeeze=>1},"[[[[[",["aa\n\nbb  cc","dd"]) }
+teststr { form({nofill=>1},"[[[[[",["aa","bb"]) }
 "aa   
-     
-bb cc
-dd   
+bb   
 ";
 # ERROR MESSAGES
 
