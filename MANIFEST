@@ -1,0 +1,9 @@
+lib/Text/Reform.pm
+Changes
+MANIFEST
+Makefile.PL
+test.pl
+demo.pl
+demo_filler.pl
+demo_table.pl
+demo_ws.pl

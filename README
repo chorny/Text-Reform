@@ -1,0 +1,39 @@
+==============================================================================
+                   Release of version 1.06 of Text::Reform
+==============================================================================
+
+
+NAME
+    Text::Reform - Manual text wrapping and reformating
+
+DESCRIPTION
+    The module supplies a re-entrant, highly configurable replacement
+    for the built-in Perl format() mechanism.
+
+AUTHOR
+    Damian Conway (damian@conway.org)
+
+COPYRIGHT
+    Copyright (c) 1997-2001, Damian Conway. All Rights Reserved.
+    This module is free software. It may be used, redistributed
+    and/or modified under the terms of the Perl Artistic License
+    (see http://www.perl.com/perl/misc/Artistic.html)
+
+
+
+==============================================================================
+
+CHANGES IN VERSION 1.06
+
+(No changes have been documented for this version)
+
+==============================================================================
+
+AVAILABILITY
+
+Text::Reform has been uploaded to the CPAN
+and is also available from:
+
+	http://www.csse.monash.edu.au/~damian/CPAN/Text-Reform.tar.gz
+
+==============================================================================

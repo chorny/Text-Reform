@@ -1,0 +1,28 @@
+Revision history for Perl extension Text::Reform.
+
+1.06	Mon Apr 16 14:40:12 2001
+
+	- Devolved &from and &tag from Text::Autoformat to Text::Reform
+	  (still shipped in Text::Autoformat distribution)
+
+	- Tweaked pod to remove invalid markup
+
+	- Documented '<<<>>>' and '[[[]]]' fields in &form
+
+	- Documented the '~' single character block field in &form
+
+	- Modified &form to convert undef fields to ""
+
+	- Fixed non-filling of multiple consecutive newlines (thanks Elias)
+
+	- Fixed left justification of last line of fully justified text
+	  (thanks Elias)
+
+	- Added 'interleave' config flag for &form
+	  See documentation on "Multi-line format specifiers"
+	  (Thanks Elias and Phil)
+
+	- Added 'filler' option to control character used to fill
+	  short lines (thanks Phil)
+
+	- Made recursive calls to &form respect page numbers correctly
