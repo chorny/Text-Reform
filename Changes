@@ -66,3 +66,11 @@ Revision history for Perl extension Text::Reform.
 
 	- fixed test.pl AGAIN!!!!!
 
+
+
+1.11	Wed May  7 09:43:53 2003
+
+	- Remove NaN tests (too platform dependent)
+
+	- Added new hyphenator: break_at
+

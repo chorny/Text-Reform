@@ -1,5 +1,5 @@
 ==============================================================================
-                   Release of version 1.10 of Text::Reform
+                   Release of version 1.11 of Text::Reform
 ==============================================================================
 
 
@@ -23,10 +23,12 @@ COPYRIGHT
 
 ==============================================================================
 
-CHANGES IN VERSION 1.10
+CHANGES IN VERSION 1.11
 
 
-	- fixed test.pl AGAIN!!!!!
+	- Remove NaN tests (too platform dependent)
+
+	- Added new hyphenator: break_at
 
 
 

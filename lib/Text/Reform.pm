@@ -2,13 +2,13 @@ package Text::Reform;
 
 use strict; use vars qw($VERSION @ISA @EXPORT @EXPORT_OK); use Carp;
 use 5.005;
-$VERSION = '1.10';
+$VERSION = '1.11';
 
 require Exporter;
 
 @ISA = qw(Exporter);
 @EXPORT = qw( form );
-@EXPORT_OK = qw( tag break_with break_wrap break_TeX );
+@EXPORT_OK = qw( tag break_with break_at break_wrap break_TeX debug );
 
 my @bspecials = qw( [ | ] );
 my @lspecials = qw( < ^ > );
@@ -25,7 +25,6 @@ my $emptyref = '';
 sub import
 {
 	use POSIX qw( localeconv );
-	$DB::single=1;
 	$decimal = localeconv()->{decimal_point} || '.';
 
 	my $lnumerical = '[>]+(?:'.quotemeta($decimal).'[<]{1,})';
@@ -69,11 +68,37 @@ sub break_with
 		}
 		else
 		{
-			@ret = (substr($_[0],0,$_[1]-length($hyphen)),
-				substr($_[0],$_[1]-length($hyphen)))
+			@ret = (substr($_[0],0,$_[1]-$hylen),
+				substr($_[0],$_[1]-$hylen))
 		}
 		if ($ret[0] =~ /\A\s*\Z/) { return ("",$_[0]); }
 		else { return ($ret[0].$hyphen,$ret[1]); }
+	}
+
+}
+
+sub break_at {
+	my $hyphen = $_[0];
+	my $hylen = length($hyphen);
+	my @ret;
+	sub
+	{
+		my $max = $_[2]-$hylen;
+		if ($max <= 0) {
+			@ret = (substr($_[0],0,1), substr($_[0],1))
+		}
+		elsif ($_[0] =~ /(.{1,$max}$hyphen)(.*)/s) {
+			@ret = ($1,$2);
+		}
+		elsif (length($_[0])>$_[2]) {
+			@ret = (substr($_[0],0,$_[1]-$hylen).$hyphen,
+				substr($_[0],$_[1]-$hylen))
+		}
+		else {
+			@ret = ("",$_[0]);
+		}
+		if ($ret[0] =~ /\A\s*\Z/) { return ("",$_[0]); }
+		else { return @ret; }
 	}
 
 }
@@ -109,12 +134,14 @@ sub break_TeX
 	}
 }
 
-sub debug { print STDERR @_, "\n" if $::DEBUG || $::DEBUG }
+my $debug = 0;
+sub _debug { print STDERR @_, "\n" if $debug }
+sub debug { $debug = 1; }
 
 sub notempty
 {
 	my $ne = ${$_[0]} =~ /\S/;
-	debug("\tnotempty('${$_[0]}') = $ne\n");
+	_debug("\tnotempty('${$_[0]}') = $ne\n");
 	return $ne;
 }
 
@@ -176,21 +203,27 @@ sub replace($$$$)   # ($fmt, $len, $argref, $config)
 			$ws =~ s/\n/$nonnl? "" : " "/ge if $config->{fill};
 			my $lead = ($config->{squeeze} ? ($ws ? " " : "") : $ws);
 			my $match = $lead . $word;
+			_debug "Extracted [$match]";
 			last if $text && $match =~ /\n/;
 			my $len1 = length($match);
 			if ($len1 <= $rem)
 			{
+				_debug "Accepted [$match]";
 				$text .= $match;
 				$rem  -= $len1;
 				$$ref = $extra;
 			}
 			else
 			{
-				if ($len1 > $_[1] and $rem-length($lead)>$config->{minbreak})
+				_debug "Need to break [$match]";
+				# was: if ($len1 > $_[1] and $rem-length($lead)>$config->{minbreak})
+				if ($rem-length($lead)>$config->{minbreak})
 				{
+					_debug "Trying to break '$match'";
 					my ($broken,$left) =
 						$config->{break}->($match,$rem,$_[1]);	
 					$text .= $broken;
+					_debug "Broke as: [$broken][$left]";
 					$$ref = $left.$extra;
 					$rem -= length $broken;
 				}
@@ -324,7 +357,7 @@ sub fix_config(\%)
 	unless (ref $config->{pagefeed} eq 'CODE')
 		{ my $tmp = $config->{pagefeed}; $config->{pagefeed} = sub { $tmp } }
 	unless (ref $config->{break} eq 'CODE')
-		{ $config->{break} = break_with($config->{break}) }
+		{ $config->{break} = break_at($config->{break}) }
 	if (defined $config->{pagenum} && ref $config->{pagenum} ne 'SCALAR') 
 		{ my $tmp = $config->{pagenum}+0; $config->{pagenum} = \$tmp }
 	unless (ref $config->{filler} eq 'HASH') {
@@ -407,10 +440,10 @@ sub form
 		}
 		elsif (!defined eval { local $SIG{__DIE__};
 				       $_[$nextarg] = $next;
-				       debug "writeable: [$_[$nextarg]]";
+				       _debug "writeable: [$_[$nextarg]]";
 				       1})
 		{
-		        debug "unwriteable: [$_[$nextarg]]";
+		        _debug "unwriteable: [$_[$nextarg]]";
 			my $arg = $_[$nextarg];
 			splice @_, $nextarg, 1, \$arg;
 		}
@@ -451,7 +484,7 @@ sub form
 				: ${$_[$startidx++]}||"";
 		}
 		my $format = shift @format_stack;
-		debug("format: [$format]");
+		_debug("format: [$format]");
 	
 		my @parts = split /(\n|(?:\\.)+|$fieldpat)/, $format;
 		push @parts, "\n" unless @parts && $parts[-1] eq "\n";
@@ -466,7 +499,7 @@ sub form
 			{
 				if ($part =~ /\A(?:\\.)+/)
 				{
-					debug("esc literal: [$part]");
+					_debug("esc literal: [$part]");
 					my $tmp = $part;
 					$tmp =~ s/\\(.)/$1/g;
 					$text .= $tmp;
@@ -481,15 +514,15 @@ sub form
 						my $type = $1;
 						$type = 'J' if $part =~ /$ljustified/;
 						croak BAD_CONFIG if ($ref[$startidx] eq 'HASH');
-						debug("once field: [$part]");
-						debug("data was: [${$_[$nextarg]}]");
+						_debug("once field: [$part]");
+						_debug("data was: [${$_[$nextarg]}]");
 						$text .= replace($type,length($part),$_[$nextarg],$config);
-						debug("data now: [${$_[$nextarg]}]");
+						_debug("data now: [${$_[$nextarg]}]");
 					}
 					else
 					{
 						$text .= substr($config->{filler}{left} x length($part), -length($part));
-						debug("missing once field: [$part]");
+						_debug("missing once field: [$part]");
 					}
 					$nextarg++;
 				}
@@ -501,16 +534,16 @@ sub form
 					my $type = $1;
 					$type = 'J' if $part =~ /$bjustified/;
 					croak BAD_CONFIG if ($ref[$startidx] eq 'HASH');
-					debug("multi field: [$part]");
-					debug("data was: [${$_[$nextarg]}]");
+					_debug("multi field: [$part]");
+					_debug("data was: [${$_[$nextarg]}]");
 					$text .= replace($type,length($part),$_[$nextarg],$config);
-					debug("data now: [${$_[$nextarg]}]");
+					_debug("data now: [${$_[$nextarg]}]");
 					push @data, $_[$nextarg];
 					$nextarg++;
 				}
 				else
 				{
-					debug("literal: [$part]");
+					_debug("literal: [$part]");
 					my $tmp = $part;
 					$tmp =~ s/\0(\0*)/$1/g;
 					$text .= $tmp;
@@ -519,7 +552,7 @@ sub form
 						$linecount++;
 						if ($config->{pagelen} && $linecount>=$config->{pagelen})
 						{
-							debug("\tejecting page:  $config->{pagenum}");
+							_debug("\tejecting page:  $config->{pagenum}");
 							carpfirst "\nWarning: could not format page ${$config->{pagenum}} within specified page length"
 								if $^W && $config->{pagelen} && $linecount > $config->{pagelen};
 							${$config->{pagenum}}++;
@@ -539,8 +572,8 @@ sub form
 						}
 					}
 				}
-				debug("\tnextarg now:  $nextarg");
-				debug("\tstartidx now: $startidx");
+				_debug("\tnextarg now:  $nextarg");
+				_debug("\tstartidx now: $startidx");
 			}
 			$firstline = 0;
 			$filled = ! grep { notempty $_ } @data;
@@ -604,7 +637,7 @@ sub form
                 if ($ref[$i] eq 'ARRAY')
                         { eval { @{$orig[$i]} = map "$_\n", split /\n/, ${$_[$i]} } }
                 elsif (!$ref[$i])
-                        { eval { debug("restoring $i (".$_[$i].") to " .
+                        { eval { _debug("restoring $i (".$_[$i].") to " .
                                  defined($orig[$i]) ? $orig[$i] : "<undef>");
                                  ${$_[$i]} = $orig[$i] } }
         }
@@ -693,8 +726,8 @@ Text::Reform - Manual text wrapping and reformatting
 
 =head1 VERSION
 
-This document describes version 1.10 of Text::Reform,
-released April  9, 2003.
+This document describes version 1.11 of Text::Reform,
+released May  7, 2003.
 
 =head1 SYNOPSIS
 
@@ -1161,14 +1194,46 @@ which could therefore be rewritten:
              @data;
 
 The subroutine C<Text::Reform::break_with> takes a single string
-argument and returns a reference to a sub which hyphenates with that
-string. Hence the first of the two examples could be rewritten:
+argument and returns a reference to a sub which hyphenates by cutting 
+off the text at the right margin and appending the string argument.
+Hence the first of the two examples could be rewritten:
 
-        use Text::Reform qw( form break_wrap );
+        use Text::Reform qw( form break_with );
 
         form { break => break_with('~') }
              $format_str,
              @data;
+
+The subroutine C<Text::Reform::break_at> takes a single string
+argument and returns a reference to a sub which hyphenates by
+breaking immediately after that string. For example:
+
+        use Text::Reform qw( form break_at );
+
+        form { break => break_at('-') }
+               "[[[[[[[[[[[[[[",
+	       "The Newton-Raphson methodology";
+
+	# returns:
+	#
+	#       "The Newton-
+	#        Raphson 
+	#        methodology"
+
+Note that this differs from the behaviour of C<break_with>, which
+would be:
+
+        form { break => break_with('-') }
+               "[[[[[[[[[[[[[[",
+	       "The Newton-Raphson methodology";
+
+	# returns:
+	#
+	#       "The Newton-R-
+	#        aphson metho-
+	#        dology"
+
+Hence C<break_at> is generally a better choice.
 
 The subroutine C<Text::Reform::break_TeX> 
 returns a reference to a sub which hyphenates using 
