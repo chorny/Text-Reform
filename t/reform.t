@@ -1,4 +1,4 @@
-#! /usr/local/bin/perl -w
+#! /usr/bin/perl -w
 
 # Before `make install' is performed this script should be runnable with
 # `make test'. After `make install' it should work as `perl test.pl'
@@ -8,26 +8,47 @@
 # Change 1..1 below to 1..last_test_to_print .
 # (It may become useful if the test is moved to ./t subdirectory.)
 
-BEGIN { $| = 1; print "1..63\n"; }
+BEGIN { $| = 1; print "1..66\n"; }
 END {print "not ok 1\n" unless $loaded;}
 my $testnum = 1;
+use Data::Dumper 'Dumper';
 sub teststr(&$) # (&sub, $retval)
 {
 	do { $testnum++;
 	     my $res = &{$_[0]};
 	     my $exp = $_[1];
+         s/ /./g for $res, $exp;
 	     print "expected [", $exp, "]\n" unless $res eq $exp;
 	     print "but got  [", $res, "]\n" unless $res eq $exp;
 	     print "not " unless $res eq $exp;
 	     print "ok $testnum\n"; };
 }
-use Text::Reform qw{ form tag break_wrap break_with };
+use Text::Reform qw{ form tag break_at break_wrap break_with };
 $loaded = 1;
 print "ok 1\n";
 
 ######################### End of black magic.
 
 START:
+
+
+# BREAK EXCEPTIONS
+
+teststr { form({break=>break_at('-')},
+               "<<<<<<<<","http://foo.bar.baz.com") }
+"http://-
+";
+
+teststr { form({break=>break_at('-',{except=>qr{http://\S*}})},
+               "<<<<<<<<","http://foo.bar.baz.com and the rest") }
+"http://foo.bar.baz.com
+";
+
+teststr { form({break=>break_at('-',{except=>qr{http://\S*}})},
+               "<<<<<<<<","prefixhttp://foo.bar.baz.com and the rest") }
+"prefix  
+";
+
 
 
 # ZERO-WIDTH FIELD SEPARATOR

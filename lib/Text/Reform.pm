@@ -2,13 +2,13 @@ package Text::Reform;
 
 use strict; use vars qw($VERSION @ISA @EXPORT @EXPORT_OK); use Carp;
 use 5.005;
-$VERSION = '1.11';
+use version; $VERSION = qv('1.12.2');
 
 require Exporter;
 
 @ISA = qw(Exporter);
 @EXPORT = qw( form );
-@EXPORT_OK = qw( tag break_with break_at break_wrap break_TeX debug );
+@EXPORT_OK = qw( columns tag break_with break_at break_wrap break_TeX debug );
 
 my @bspecials = qw( [ | ] );
 my @lspecials = qw( < ^ > );
@@ -43,7 +43,7 @@ sub import
 }
 
 sub carpfirst {
-	our %carped;
+	use vars '%carped';
 	my ($msg) = @_;
 	return if $carped{$msg}++;
 	carp $msg;
@@ -78,8 +78,9 @@ sub break_with
 }
 
 sub break_at {
-	my $hyphen = $_[0];
+	my ($hyphen, $opts_ref) = @_;
 	my $hylen = length($hyphen);
+    my $except = $opts_ref->{except};
 	my @ret;
 	sub
 	{
@@ -87,7 +88,13 @@ sub break_at {
 		if ($max <= 0) {
 			@ret = (substr($_[0],0,1), substr($_[0],1))
 		}
-		elsif ($_[0] =~ /(.{1,$max}$hyphen)(.*)/s) {
+        elsif (defined $except && $_[0] =~ m/\A (.{1,$max}) ($except .*)/xms) {
+			@ret = ($1,$2);
+        }
+        elsif (defined $except && $_[0] =~ m/\A ($except) (.*)/xms) {
+			@ret = ($1,$2);
+        }
+		elsif ($_[0] =~ /\A (.{1,$max}$hyphen) (.*)/xms) {
 			@ret = ($1,$2);
 		}
 		elsif (length($_[0])>$_[2]) {
@@ -100,7 +107,6 @@ sub break_at {
 		if ($ret[0] =~ /\A\s*\Z/) { return ("",$_[0]); }
 		else { return @ret; }
 	}
-
 }
 
 sub break_wrap
@@ -116,7 +122,7 @@ sub break_TeX
 {
 	my $file = $_[0] || "";
 
-	croak "Can't find TeX::Hypen module"
+	croak "Can't find TeX::Hyphen module"
 		unless require "TeX/Hyphen.pm";
 
 	$hyp{$file} = TeX::Hyphen->new($file||undef)
@@ -375,7 +381,7 @@ sub FormOpt::DESTROY
 
 sub form
 {
-	our %carped;
+	use vars '%carped';
 	local %carped;
 	my $config = {%std_config};
 	my $startidx = 0;
@@ -769,7 +775,7 @@ A single < is formatted as the literal character '<'
 Right-justified field indicator.
 A series of two or more sequential >'s specify
 a right-justified field to be filled by a subsequent value.
-A single < is formatted as the literal character '<'
+A single > is formatted as the literal character '>'
 
 =item <<<>>>
 
@@ -782,7 +788,7 @@ must be at least 2 '<' and 2 '>'.
 Centre-justified field indicator.
 A series of two or more sequential ^'s specify
 a centred field to be filled by a subsequent value.
-A single ^ is formatted as the literal character '<'
+A single ^ is formatted as the literal character '^'
 
 =item >>>.<<<<
 
@@ -1234,6 +1240,21 @@ would be:
 	#        dology"
 
 Hence C<break_at> is generally a better choice.
+
+C<break_at> also takes an 'except' option, which tells the resulting
+subroutine not to break in the middle of certain strings. For example:
+
+        form { break => break_at('-', {except=>qr/Newton-Raphson/}) }
+               "[[[[[[[[[[[[[[",
+	       "The Newton-Raphson methodology";
+
+	# returns:
+	#
+	#       "The
+    #        Newton-Raphson 
+	#        methodology"
+
+This option is particularly useful for preserving URLs.
 
 The subroutine C<Text::Reform::break_TeX> 
 returns a reference to a sub which hyphenates using 
@@ -1851,12 +1872,40 @@ Damian Conway (damian@conway.org)
 
 =head1 BUGS
 
+The module uses C<POSIX::strtod>, which may be broken under certain versions
+of Windows. Applying the WINDOWS_PATCH patch to Reform.pm will replace the
+POSIX function with a copycat subroutine.
+
 There are undoubtedly serious bugs lurking somewhere in code this funky :-)
 Bug reports and other feedback are most welcome.
 
-=head1 COPYRIGHT
+=head1 LICENCE AND COPYRIGHT
 
-Copyright (c) 1997-2000, Damian Conway. All Rights Reserved.
-This module is free software. It may be used, redistributed
-and/or modified under the terms of the Perl Artistic License
-  (see http://www.perl.com/perl/misc/Artistic.html)
+Copyright (c) 1997-2007, Damian Conway C<< <DCONWAY@CPAN.org> >>. All rights reserved.
+
+This module is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself. See L<perlartistic>.
+
+
+=head1 DISCLAIMER OF WARRANTY
+
+BECAUSE THIS SOFTWARE IS LICENSED FREE OF CHARGE, THERE IS NO WARRANTY
+FOR THE SOFTWARE, TO THE EXTENT PERMITTED BY APPLICABLE LAW. EXCEPT WHEN
+OTHERWISE STATED IN WRITING THE COPYRIGHT HOLDERS AND/OR OTHER PARTIES
+PROVIDE THE SOFTWARE "AS IS" WITHOUT WARRANTY OF ANY KIND, EITHER
+EXPRESSED OR IMPLIED, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE. THE
+ENTIRE RISK AS TO THE QUALITY AND PERFORMANCE OF THE SOFTWARE IS WITH
+YOU. SHOULD THE SOFTWARE PROVE DEFECTIVE, YOU ASSUME THE COST OF ALL
+NECESSARY SERVICING, REPAIR, OR CORRECTION.
+
+IN NO EVENT UNLESS REQUIRED BY APPLICABLE LAW OR AGREED TO IN WRITING
+WILL ANY COPYRIGHT HOLDER, OR ANY OTHER PARTY WHO MAY MODIFY AND/OR
+REDISTRIBUTE THE SOFTWARE AS PERMITTED BY THE ABOVE LICENCE, BE
+LIABLE TO YOU FOR DAMAGES, INCLUDING ANY GENERAL, SPECIAL, INCIDENTAL,
+OR CONSEQUENTIAL DAMAGES ARISING OUT OF THE USE OR INABILITY TO USE
+THE SOFTWARE (INCLUDING BUT NOT LIMITED TO LOSS OF DATA OR DATA BEING
+RENDERED INACCURATE OR LOSSES SUSTAINED BY YOU OR THIRD PARTIES OR A
+FAILURE OF THE SOFTWARE TO OPERATE WITH ANY OTHER SOFTWARE), EVEN IF
+SUCH HOLDER OR OTHER PARTY HAS BEEN ADVISED OF THE POSSIBILITY OF
+SUCH DAMAGES.

@@ -1,7 +1,4 @@
-==============================================================================
-                   Release of version 1.11 of Text::Reform
-==============================================================================
-
+Text::Reform version 1.12.2
 
 NAME
     Text::Reform - Manual text wrapping and reformating
@@ -10,32 +7,33 @@ DESCRIPTION
     The module supplies a re-entrant, highly configurable replacement
     for the built-in Perl format() mechanism.
 
-AUTHOR
-    Damian Conway (damian@conway.org)
+INSTALLATION
 
-COPYRIGHT
-    Copyright (c) 1997-2001, Damian Conway. All Rights Reserved.
-    This module is free software. It may be used, redistributed
-    and/or modified under the terms of the Perl Artistic License
-    (see http://www.perl.com/perl/misc/Artistic.html)
+To install this module, run the following commands:
 
-
-
-==============================================================================
-
-CHANGES IN VERSION 1.11
+    perl Makefile.PL
+    make
+    make test
+    make install
 
 
-	- Remove NaN tests (too platform dependent)
+Alternatively, to install with Module::Build, you can use the following commands:
 
-	- Added new hyphenator: break_at
+    perl Build.PL
+    ./Build
+    ./Build test
+    ./Build install
 
 
 
-==============================================================================
+DEPENDENCIES
 
-AVAILABILITY
+None.
 
-Text::Reform has been uploaded to the CPAN
 
-==============================================================================
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2000-2007, Damian Conway
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.

@@ -1,4 +1,4 @@
-Revision history for Perl extension Text::Reform.
+Revision history for Text-Reform
 
 1.06	Mon Apr 16 14:40:12 2001
 
@@ -73,4 +73,31 @@ Revision history for Perl extension Text::Reform.
 	- Remove NaN tests (too platform dependent)
 
 	- Added new hyphenator: break_at
+
+
+
+
+1.12.0  Sun Sep 30 04:51:21 2007
+
+	- Added &columns to export list (thanks Bob)
+
+	- Fixed doc buglets (thanks Mike)
+
+	- Removed use of 'our' to preserve 5.005 compatibility
+
+	- Fixed shebang lines in demos 
+
+    - Added WINDOWS_PATCH to patch around apparent bug in POSIX::strtod
+      under Windows (thanks Torsten)
+
+    - Added 'except' option to break_at() (thanks Bron)
+
+    - Changed to dual licensing for Fedora compatibility
+
+
+1.12.1  Sun Sep 30 05:08:10 2007
+
+
+
+1.12.2  Sun Sep 30 05:10:18 2007
 
