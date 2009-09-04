@@ -1,5 +1,5 @@
+use 5.005;
 use strict;
-use warnings;
 use Module::Build;
 
 my $builder = Module::Build->new(
@@ -10,6 +10,7 @@ my $builder = Module::Build->new(
     requires => {
         'Test::More' => 0,
         'version'    => 0,
+        'perl'       => 5.005,
     },
     add_to_cleanup      => [ 'Text-Reform-*' ],
 );
