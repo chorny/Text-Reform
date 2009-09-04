@@ -11,7 +11,7 @@
 BEGIN { $| = 1; print "1..66\n"; }
 END {print "not ok 1\n" unless $loaded;}
 my $testnum = 1;
-use Data::Dumper 'Dumper';
+#use Data::Dumper 'Dumper';
 sub teststr(&$) # (&sub, $retval)
 {
 	do { $testnum++;

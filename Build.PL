@@ -8,9 +8,11 @@ my $builder = Module::Build->new(
     dist_author         => 'Damian Conway <DCONWAY@CPAN.org>',
     dist_version_from   => 'lib/Text/Reform.pm',
     requires => {
-        'Test::More' => 0,
         'version'    => 0,
         'perl'       => 5.005,
+    },
+    build_requires => {
+        'Test::More' => 0,
     },
     add_to_cleanup      => [ 'Text-Reform-*' ],
 );
