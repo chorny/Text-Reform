@@ -18,10 +18,14 @@ sub teststr(&$) # (&sub, $retval)
 	     my $res = &{$_[0]};
 	     my $exp = $_[1];
          s/ /./g for $res, $exp;
-	     print "expected [", $exp, "]\n" unless $res eq $exp;
-	     print "but got  [", $res, "]\n" unless $res eq $exp;
-	     print "not " unless $res eq $exp;
-	     print "ok $testnum\n"; };
+             if ($res eq $exp) {
+               print "ok $testnum\n";
+             } else {
+	       print "expected [", $exp, "]\n";
+	       print "but got  [", $res, "]\n";
+	       print "not ok $testnum\n";
+	     }
+ 	   };
 }
 use Text::Reform qw{ form tag break_at break_wrap break_with };
 $loaded = 1;
