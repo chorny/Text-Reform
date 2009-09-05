@@ -8,7 +8,8 @@ my $builder = Module::Build->new(
     dist_author         => 'Damian Conway <DCONWAY@CPAN.org>',
     dist_version_from   => 'lib/Text/Reform.pm',
     requires => {
-        'version'    => 0,
+#        'version'    => 0,
+        'Exporter'   => 0,
         'perl'       => 5.005,
     },
     build_requires => {

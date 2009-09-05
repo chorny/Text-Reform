@@ -2,7 +2,8 @@ package Text::Reform;
 
 use strict; use vars qw($VERSION @ISA @EXPORT @EXPORT_OK); use Carp;
 use 5.005;
-use version; $VERSION = qv('1.12.2');
+#use version;
+$VERSION = '1.20';
 
 require Exporter;
 
@@ -743,8 +744,8 @@ Text::Reform - Manual text wrapping and reformatting
 
 =head1 VERSION
 
-This document describes version 1.11 of Text::Reform,
-released May  7, 2003.
+This document describes version 1.20 of Text::Reform,
+released 2009-09-06.
 
 =head1 SYNOPSIS
 
@@ -1477,7 +1478,7 @@ by giving the configuration option 'numeric' a value that matches
         EONUMS
 
 would print:
-                   
+
         (    1.00)
         (    1.00)
 
@@ -1502,7 +1503,7 @@ ignored. For example:
         EONUMS
 
 would print:
-                   
+
         (    1.0 )
         (    4.0 )
 

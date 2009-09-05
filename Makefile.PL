@@ -9,8 +9,9 @@ WriteMakefile(
     ABSTRACT_FROM       => 'lib/Text/Reform.pm',
     PL_FILES            => {},
     PREREQ_PM => {
+        'Exporter'   => 0,
         'Test::More' => 0,
-        'version'    => 0,
+        #'version'    => 0,
     },
     dist                => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
     clean               => { FILES => 'Text-Reform-*' },
