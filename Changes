@@ -101,3 +101,8 @@ Revision history for Text-Reform
 
 1.12.2  Sun Sep 30 05:10:18 2007
 
+
+1.13           (Alexandr Ciornii)
+     - reform.t ported to Test::More
+     - Better prereqs
+     - Buggy support of locale removed
