@@ -16,6 +16,11 @@ my $builder = Module::Build->new(
         'Test::More' => 0,
     },
     add_to_cleanup      => [ 'Text-Reform-*' ],
+    meta_merge => {
+        resources=> {
+            repository => 'http://github.com/chorny/Text-Reform',
+        },
+    },
 );
 
 $builder->create_build_script();
