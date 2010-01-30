@@ -20,6 +20,7 @@ my $builder = Module::Build->new(
         resources=> {
             repository => 'http://github.com/chorny/Text-Reform',
         },
+        keywords => ['text formatting',],
     },
 );
 
