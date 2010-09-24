@@ -1,3 +1,5 @@
+#!/usr/bin/perl -w
+
 use POSIX qw(locale_h);
 setlocale(LC_ALL, "de");
 
